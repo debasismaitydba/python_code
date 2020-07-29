@@ -1,0 +1,42 @@
+import os
+
+print("root prints out directories only from what you specified")
+print("dirs prints out sub-directories from root")
+print("files prints out all files from root and directories")
+print("*" * 20)
+l=[]
+lm=[]
+
+
+for root, dirs, files in os.walk("/data/cassandra/data"):
+    lm.append(root)
+    if root.find("snapshots") != -1:
+        if root[-9:]=="snapshots":
+                root = root[:-9]
+                b=root.split('/')
+                #print b[4],'   ',b[5][:-33]
+                x=b[4]
+                y=b[5]
+                z=b[5][:-33]
+                print x,'   ',z
+                l.append([x,y])
+
+
+for i in l:
+        if i[0]=="system":
+                continue;
+        elif i[0]=="system_schema":
+                continue;
+        elif i[0]=="system_auth":
+                continue;
+        else:
+                for j in lm:
+                        if  j.find(i[0])!= -1 and j.find(i[1])!= -1:
+                                if j[-9:]=="snapshots":
+                                        s=max([os.path.join(j,d) for d in os.listdir(j)], key=os.path.getmtime)
+                                        for root, dirs, files in os.walk("/data/cassandra/data"):
+                                                if root.find(i[0])!= -1  and root.find('/'+i[1][:-33]+'-')!= -1:
+                                                        if root[-7:]=="backups":
+                                                                t=root[:-7];
+                                        print 'cp -pr ',s+'/* ' ,t
+
